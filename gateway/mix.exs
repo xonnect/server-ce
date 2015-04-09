@@ -24,6 +24,7 @@ defmodule XonnectGateway.Mixfile do
      {:exlager, git: "git://github.com/khia/exlager.git"},
      {:amnesia, git: "git://github.com/meh/amnesia.git"},
      {:poolboy, git: "git://github.com/devinus/poolboy.git", override: true},
-     {:uuid, git: "git://github.com/okeuday/uuid.git"}]
+     {:uuid, git: "git://github.com/okeuday/uuid.git"},
+     {:bson, git: "git://github.com/checkiz/elixir-bson.git"}]
   end
 end

@@ -1,4 +1,5 @@
 %{"amnesia": {:git, "git://github.com/meh/amnesia.git", "9837a0415d8480784224ad7a9d80af45075de0fc", []},
+  "bson": {:git, "git://github.com/checkiz/elixir-bson.git", "7544ee9ec6565a336d105a34c8267ca4f0dda0e7", []},
   "cowboy": {:git, "git://github.com/ninenines/cowboy.git", "b57f94661f5fd186f55eb0fead49849e0b1399d1", [ref: "b57f94661f5fd186f55eb0fead49849e0b1399d1"]},
   "cowlib": {:git, "git://github.com/ninenines/cowlib.git", "d544a494af4dbc810fc9c15eaf5cc050cced1501", [ref: "1.0.0"]},
   "exlager": {:git, "git://github.com/khia/exlager.git", "dca404300b04d2ad8f42e9ecc6f4c757e169071f", []},
