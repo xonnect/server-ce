@@ -1,0 +1,13 @@
+%{"amnesia": {:git, "git://github.com/meh/amnesia.git", "9837a0415d8480784224ad7a9d80af45075de0fc", []},
+  "cowboy": {:git, "git://github.com/ninenines/cowboy.git", "b57f94661f5fd186f55eb0fead49849e0b1399d1", [ref: "b57f94661f5fd186f55eb0fead49849e0b1399d1"]},
+  "cowlib": {:git, "git://github.com/ninenines/cowlib.git", "d544a494af4dbc810fc9c15eaf5cc050cced1501", [ref: "1.0.0"]},
+  "exlager": {:git, "git://github.com/khia/exlager.git", "dca404300b04d2ad8f42e9ecc6f4c757e169071f", []},
+  "exquisite": {:hex, :exquisite, "0.1.4"},
+  "goldrush": {:git, "git://github.com/DeadZen/goldrush.git", "71e63212f12c25827e0c1b4198d37d5d018a7fec", [tag: "0.1.6"]},
+  "jsx": {:git, "git://github.com/talentdeficit/jsx.git", "327f0d2875676e17ed1cdff803df62ac85fd648c", []},
+  "lager": {:git, "https://github.com/basho/lager.git", "d33ccf3b69de09a628fe38b4d7981bb8671b8a4f", []},
+  "poolboy": {:git, "git://github.com/devinus/poolboy.git", "42c631720e16cd9657585c125d1e1cf3acc82c59", []},
+  "quickrand": {:hex, :quickrand, "1.4.0"},
+  "ranch": {:git, "git://github.com/ninenines/ranch.git", "adf1822defc2b7cfdc7aca112adabfa1d614043c", [ref: "1.0.0"]},
+  "sockjs": {:git, "git://github.com/xhs/sockjs-erlang.git", "17a54a83734193c0fdfd432717d6d8a7856bcb44", []},
+  "uuid": {:git, "git://github.com/okeuday/uuid.git", "41e4e0edc4fe6291227b3fe74f7c2362f2525b21", []}}
