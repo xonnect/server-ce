@@ -15,6 +15,7 @@ defmodule Handler.Socket do
   end
 
   def sockjs_handle(connection, data, {:unknown, socket_info}) do
+    Lager.debug "[handler.socket/sockjs_handle] socket info: ~p", [socket_info]
     try do
       list = :jsx.decode data
       try do
@@ -23,7 +24,7 @@ defmodule Handler.Socket do
         do_handle connection, action, list, {:json, socket_info}
       rescue
         _whatever ->
-          Lager.info "[handler.socket/sockjs_handle] bad json request"
+          Lager.debug "[handler.socket/sockjs_handle] bad json request"
           body = encode_body :json, "error", "bad.request", :null
           connection.send body
           {:ok, {:json, socket_info}}
@@ -36,7 +37,7 @@ defmodule Handler.Socket do
           do_handle connection, action, map, {:bson, socket_info}
         rescue
           _whatever ->
-            Lager.info "[handler.socket/sockjs_handle] bad bson request"
+            Lager.debug "[handler.socket/sockjs_handle] bad bson request"
             body = encode_body :bson, "error", "bad.request", :null
             connection.send body
             {:ok, {:bson, socket_info}}
@@ -53,7 +54,7 @@ defmodule Handler.Socket do
       do_handle connection, action, list, state
     rescue
       _whatever ->
-        Lager.info "[handler.socket/sockjs_handle] bad json request"
+        Lager.debug "[handler.socket/sockjs_handle] bad json request"
         body = encode_body :json, "error", "bad.request", :null
         connection.send body
         {:ok, state}
@@ -68,7 +69,7 @@ defmodule Handler.Socket do
       do_handle connection, action, map, state
     rescue
       _whatever ->
-        Lager.info "[handler.socket/sockjs_handle] bad bson request"
+        Lager.debug "[handler.socket/sockjs_handle] bad bson request"
         body = encode_body :bson, "error", "bad.request", :null
         connection.send body
         {:ok, state}
