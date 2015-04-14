@@ -25,7 +25,7 @@ defmodule Handler.Socket do
       rescue
         _whatever ->
           Lager.debug "[handler.socket/sockjs_handle] bad json request"
-          body = encode_body :json, "error", "bad.request", :null
+          body = encode_body :json, "error", "bad.request"
           connection.send body
           {:ok, {:json, socket_info}}
       end
@@ -38,7 +38,7 @@ defmodule Handler.Socket do
         rescue
           _whatever ->
             Lager.debug "[handler.socket/sockjs_handle] bad bson request"
-            body = encode_body :bson, "error", "bad.request", :null
+            body = encode_body :bson, "error", "bad.request"
             connection.send body
             {:ok, {:bson, socket_info}}
         end
@@ -55,7 +55,7 @@ defmodule Handler.Socket do
     rescue
       _whatever ->
         Lager.debug "[handler.socket/sockjs_handle] bad json request"
-        body = encode_body :json, "error", "bad.request", :null
+        body = encode_body :json, "error", "bad.request"
         connection.send body
         {:ok, state}
     end
@@ -70,7 +70,7 @@ defmodule Handler.Socket do
     rescue
       _whatever ->
         Lager.debug "[handler.socket/sockjs_handle] bad bson request"
-        body = encode_body :bson, "error", "bad.request", :null
+        body = encode_body :bson, "error", "bad.request"
         connection.send body
         {:ok, state}
     end
@@ -91,23 +91,39 @@ defmodule Handler.Socket do
     {:ok, state}
   end
 
+  defp encode_body(:json, code, info) do
+    do_encode_json(code, info, nil)
+  end
+
+  defp encode_body(:bson, code, info) do
+    do_encode_bson(code, info, nil)
+  end
+
   defp encode_body(:json, code, info, data) do
+    do_encode_json(code, info, data)
+  end
+
+  defp encode_body(:bson, code, info, data) do
+    do_encode_bson(code, info, data)
+  end
+
+  defp do_encode_json(code, info, data) do
     response = [
       code: code,
       info: info,
       data: data
     ]
-    response = Enum.filter response, fn({_k, v}) -> v != :null end
+    response = Enum.filter response, fn({_k, v}) -> v != nil end
     :jsx.encode response
   end
 
-  defp encode_body(:bson, code, info, data) do
+  defp do_encode_bson(code, info, data) do
     response = %{
       code: code,
       info: info,
       data: data
     }
-    response = Enum.filter response, fn({_k, v}) -> v != :null end
+    response = Enum.filter response, fn({_k, v}) -> v != nil end
     Bson.encode response
   end
 end
