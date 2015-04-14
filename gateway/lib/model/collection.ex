@@ -4,7 +4,7 @@ defmodule Model.Collection do
   end
 
   def get(collection, key) when is_list(collection) do
-    Keyword.get collection, key, nil
+    :proplists.get_value key, collection, nil
   end
 
   def get(collection, key, default) when is_map(collection) do
@@ -12,6 +12,6 @@ defmodule Model.Collection do
   end
 
   def get(collection, key, default) when is_list(collection) do
-    Keyword.get collection, key, default
+    :proplists.get_value key, collection, default
   end
 end

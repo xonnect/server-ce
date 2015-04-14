@@ -1,10 +1,13 @@
 defmodule Handler.Socket do
+  alias Model.Collection, as: Collection
+  alias Nick.Agent, as: Nick
   import Model.Record
   require Lager
   @bahaviour :sockjs_service
 
   fields socket: nil,
-         ip_address: nil
+         ip_address: nil,
+         nick: nil
 
   def sockjs_init(connection, []) do
     [{:headers, headers}] = Enum.filter connection.info, fn({k, _v}) -> k == :headers end
@@ -76,8 +79,36 @@ defmodule Handler.Socket do
     end
   end
 
+  defp do_handle(connection, "register", collection, {interface, socket_info}) do
+    case socket_info.nick do
+      nil ->
+        result = Collection.get collection, "nick"
+        case result do
+          nil ->
+            {:ok, nick} = Nick.register
+            socket_info = socket_info.update nick: nick
+            body = encode_body interface, "ok", "register.ok", nick
+            connection.send body
+          nick ->
+            try do
+              {:ok, nick} = Nick.register nick
+              socket_info = socket_info.update nick: nick
+              body = encode_body interface, "ok", "register.ok", nick
+              connection.send body
+            rescue
+              _whatever ->
+                body = encode_body interface, "error", "register.conflict", nick
+                connection.send body
+            end
+        end
+      nick ->
+        body = encode_body interface, "ok", "register.ok", nick
+        connection.send body
+    end
+    {:ok, {interface, socket_info}}
+  end
+
   defp do_handle(connection, action, _collection, state={interface, _}) do
-    Lager.debug "[handler.socket/do_handle] request action: ~p", [action]
     body = encode_body interface, "error", "unsupported.action", action
     connection.send body
     {:ok, state}

@@ -12,3 +12,7 @@ config :lager, :handlers,
 config :exlager,
   level: :debug,
   truncation_size: 8192
+
+config :gateway, :nick_worker_pool,
+  size: 8,
+  max_overflow: 12
