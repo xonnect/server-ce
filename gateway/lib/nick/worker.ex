@@ -31,6 +31,14 @@ defmodule Nick.Worker do
     end
   end
 
+  def handle_cast({:send, from, to, data}, state) do
+    socket = Cache.get {:nick, to}
+    if socket != nil do
+      send socket, {:direct_message, from, data}
+    end
+    {:noreply, state}
+  end
+
   def handle_info({:'DOWN', _, _, socket, _}, state) do
     Lager.debug "[nick.worker/handle_info] socket ~p lost connection", [socket]
     nick = Cache.get {:socket, socket}

@@ -108,8 +108,40 @@ defmodule Handler.Socket do
     {:ok, {interface, socket_info}}
   end
 
+  defp do_handle(connection, "send", collection, {interface, socket_info}) do
+    if socket_info.nick == nil do
+      {:ok, nick} = Nick.register
+      body = encode_body interface, "ok", "register.ok", nick
+      connection.send body
+      socket_info = socket_info.update nick: nick
+    end
+
+    target = Collection.get collection, "target"
+    true = target != nil
+    true = String.length(target) > 1
+    data = Collection.get collection, "data"
+    true = data != nil
+    ref = Collection.get collection, "ref"
+    case String.first target do
+      "@" ->
+        nick = String.slice target, 1..-1
+        Nick.send socket_info.nick, nick, data
+        if ref != nil do
+          body = encode_body interface, "ok", "send.ok", [ref: ref]
+          connection.send body
+        end
+    end
+    {:ok, {interface, socket_info}}
+  end
+
   defp do_handle(connection, action, _collection, state={interface, _}) do
     body = encode_body interface, "error", "unsupported.action", action
+    connection.send body
+    {:ok, state}
+  end
+
+  def sockjs_info(connection, {:direct_message, from, data}, state={interface, _}) do
+    body = encode_body interface, "new", [from: "@" <> from], data
     connection.send body
     {:ok, state}
   end

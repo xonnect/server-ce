@@ -12,16 +12,21 @@ defmodule Nick.Agent do
     supervise children, strategy: :one_for_one, max_restarts: 10, max_seconds: 10
   end
 
-  # api
+  # Supervisor api
   def start_link() do
     Supervisor.start_link __MODULE__, [], [name: __MODULE__]
   end
 
+  # api
   def register() do
     :poolboy.transaction(@pool, fn(worker) -> GenServer.call(worker, :register) end)
   end
 
   def register(nick) do
     :poolboy.transaction(@pool, fn(worker) -> GenServer.call(worker, {:register, nick}) end)
+  end
+
+  def send(from, to, data) do
+    :poolboy.transaction(@pool, fn(worker) -> GenServer.cast(worker, {:send, from, to, data}) end)
   end
 end
