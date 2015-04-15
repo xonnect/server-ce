@@ -28,7 +28,7 @@ defmodule Handler.Socket do
       rescue
         _whatever ->
           Lager.debug "[handler.socket/sockjs_handle] bad json request"
-          body = encode_body :json, "error", "bad.request"
+          body = Utility.encode_body :json, "error", "bad.request"
           connection.send body
           {:ok, {:json, socket_info}}
       end
@@ -41,7 +41,7 @@ defmodule Handler.Socket do
         rescue
           _whatever ->
             Lager.debug "[handler.socket/sockjs_handle] bad bson request"
-            body = encode_body :bson, "error", "bad.request"
+            body = Utility.encode_body :bson, "error", "bad.request"
             connection.send body
             {:ok, {:bson, socket_info}}
         end
@@ -58,7 +58,7 @@ defmodule Handler.Socket do
     rescue
       _whatever ->
         Lager.debug "[handler.socket/sockjs_handle] bad json request"
-        body = encode_body :json, "error", "bad.request"
+        body = Utility.encode_body :json, "error", "bad.request"
         connection.send body
         {:ok, state}
     end
@@ -73,7 +73,7 @@ defmodule Handler.Socket do
     rescue
       _whatever ->
         Lager.debug "[handler.socket/sockjs_handle] bad bson request"
-        body = encode_body :bson, "error", "bad.request"
+        body = Utility.encode_body :bson, "error", "bad.request"
         connection.send body
         {:ok, state}
     end
@@ -87,22 +87,22 @@ defmodule Handler.Socket do
           nil ->
             {:ok, nick} = Nick.register
             socket_info = socket_info.update nick: nick
-            body = encode_body interface, "ok", "register.ok", nick
+            body = Utility.encode_body interface, "ok", "register.ok", nick
             connection.send body
           nick ->
             try do
               {:ok, nick} = Nick.register nick
               socket_info = socket_info.update nick: nick
-              body = encode_body interface, "ok", "register.ok", nick
+              body = Utility.encode_body interface, "ok", "register.ok", nick
               connection.send body
             rescue
               _whatever ->
-                body = encode_body interface, "error", "register.conflict", nick
+                body = Utility.encode_body interface, "error", "register.conflict", nick
                 connection.send body
             end
         end
       nick ->
-        body = encode_body interface, "ok", "register.ok", nick
+        body = Utility.encode_body interface, "ok", "register.ok", nick
         connection.send body
     end
     {:ok, {interface, socket_info}}
@@ -111,7 +111,7 @@ defmodule Handler.Socket do
   defp do_handle(connection, "send", collection, {interface, socket_info}) do
     if socket_info.nick == nil do
       {:ok, nick} = Nick.register
-      body = encode_body interface, "ok", "register.ok", nick
+      body = Utility.encode_body interface, "ok", "register.ok", nick
       connection.send body
       socket_info = socket_info.update nick: nick
     end
@@ -127,7 +127,7 @@ defmodule Handler.Socket do
         nick = String.slice target, 1..-1
         Nick.send socket_info.nick, nick, data
         if ref != nil do
-          body = encode_body interface, "ok", "send.ok", [ref: ref]
+          body = Utility.encode_body interface, "ok", "send.ok", [ref: ref]
           connection.send body
         end
     end
@@ -135,13 +135,13 @@ defmodule Handler.Socket do
   end
 
   defp do_handle(connection, action, _collection, state={interface, _}) do
-    body = encode_body interface, "error", "unsupported.action", action
+    body = Utility.encode_body interface, "error", "unsupported.action", action
     connection.send body
     {:ok, state}
   end
 
   def sockjs_info(connection, {:direct_message, from, data}, state={interface, _}) do
-    body = encode_body interface, "new", [from: "@" <> from], data
+    body = Utility.encode_body interface, "new", [from: from], data
     connection.send body
     {:ok, state}
   end
@@ -152,41 +152,5 @@ defmodule Handler.Socket do
 
   def sockjs_terminate(_connection, state) do
     {:ok, state}
-  end
-
-  defp encode_body(:json, code, info) do
-    do_encode_json(code, info, nil)
-  end
-
-  defp encode_body(:bson, code, info) do
-    do_encode_bson(code, info, nil)
-  end
-
-  defp encode_body(:json, code, info, data) do
-    do_encode_json(code, info, data)
-  end
-
-  defp encode_body(:bson, code, info, data) do
-    do_encode_bson(code, info, data)
-  end
-
-  defp do_encode_json(code, info, data) do
-    response = [
-      code: code,
-      info: info,
-      data: data
-    ]
-    response = Enum.filter response, fn({_k, v}) -> v != nil end
-    :jsx.encode response
-  end
-
-  defp do_encode_bson(code, info, data) do
-    response = %{
-      code: code,
-      info: info,
-      data: data
-    }
-    response = Enum.filter response, fn({_k, v}) -> v != nil end
-    Bson.encode response
   end
 end
