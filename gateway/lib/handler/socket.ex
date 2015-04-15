@@ -6,14 +6,10 @@ defmodule Handler.Socket do
   @bahaviour :sockjs_service
 
   fields socket: nil,
-         ip_address: nil,
          nick: nil
 
-  def sockjs_init(connection, []) do
-    [{:headers, headers}] = Enum.filter connection.info, fn({k, _v}) -> k == :headers end
-    [{:'x-real-ip', ip_address}] = Enum.filter headers, fn({k, _v}) -> k == :'x-real-ip' end
-    Lager.info "[handler.socket/sockjs_init] socket ip address: ~p", [ip_address]
-    socket_info = new socket: self, ip_address: ip_address
+  def sockjs_init(_connection, []) do
+    socket_info = new socket: self
     {:ok, {:unknown, socket_info}}
   end
 
