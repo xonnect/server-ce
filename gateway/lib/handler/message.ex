@@ -2,6 +2,7 @@ defmodule Handler.Message do
   use Cowboy.HTTP
   alias Model.Collection, as: Collection
   alias Nick.Agent, as: Nick
+  alias Channel.Agent, as: Channel
 
   def handle(request, state) do
     {method, request1} = :cowboy_req.method(request)
@@ -20,7 +21,10 @@ defmodule Handler.Message do
       case String.first target do
         "@" ->
           nick = String.slice target, 1..-1
-          Nick.send "~http", nick, data
+          Nick.send "~unknown", nick, data
+        "#" ->
+          channel = String.slice target, 1..-1
+          Channel.broadcast channel, data
       end
       {:ok, request2} = :cowboy_req.reply(201, request1)
       {:ok, request2, state}
@@ -34,8 +38,8 @@ defmodule Handler.Message do
     end
   end
 
-  defp do_handle(_method, request, state) do
-    body = Utility.encode_body :json, "error", "bad.request"
+  defp do_handle(method, request, state) do
+    body = Utility.encode_body :json, "error", "unsupported.method", method
     {:ok, request1} = :cowboy_req.reply(400, [
       {"content-type", "application/json; charset=utf-8"}
     ], body, request)

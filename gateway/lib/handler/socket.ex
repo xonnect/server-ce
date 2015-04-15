@@ -1,6 +1,7 @@
 defmodule Handler.Socket do
   alias Model.Collection, as: Collection
   alias Nick.Agent, as: Nick
+  alias Channel.Agent, as: Channel
   import Model.Record
   require Lager
   @bahaviour :sockjs_service
@@ -122,11 +123,32 @@ defmodule Handler.Socket do
       "@" ->
         nick = String.slice target, 1..-1
         Nick.send "@" <> socket_info.nick, nick, data
-        if ref != nil do
-          body = Utility.encode_body interface, "ok", "send.ok", [ref: ref]
-          connection.send body
-        end
+      "#" ->
+        channel = String.slice target, 1..-1
+        Channel.broadcast channel, data, socket_info
     end
+    if ref != nil do
+      body = Utility.encode_body interface, "ok", "send.ok", [ref: ref]
+      connection.send body
+    end
+    {:ok, {interface, socket_info}}
+  end
+
+  defp do_handle(connection, "subscribe", collection, {interface, socket_info}) do
+    channel = Collection.get collection, "channel"
+    true = channel != nil
+    :ok = Channel.subscribe channel, socket_info
+    body = Utility.encode_body interface, "ok", "subscribe.ok", channel
+    connection.send body
+    {:ok, {interface, socket_info}}
+  end
+
+  defp do_handle(connection, "unsubscribe", collection, {interface, socket_info}) do
+    channel = Collection.get collection, "channel"
+    true = channel != nil
+    :ok = Channel.unsubscribe channel, socket_info
+    body = Utility.encode_body interface, "ok", "unsubscribe.ok", channel
+    connection.send body
     {:ok, {interface, socket_info}}
   end
 
@@ -137,6 +159,12 @@ defmodule Handler.Socket do
   end
 
   def sockjs_info(connection, {:direct_message, from, data}, state={interface, _}) do
+    body = Utility.encode_body interface, "new", [from: from], data
+    connection.send body
+    {:ok, state}
+  end
+
+  def sockjs_info(connection, {:channel_message, from, data}, state={interface, _}) do
     body = Utility.encode_body interface, "new", [from: from], data
     connection.send body
     {:ok, state}

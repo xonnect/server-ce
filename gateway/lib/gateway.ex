@@ -27,6 +27,7 @@ defmodule XonnectGateway do
 
     children = [
       supervisor(Nick.Agent, []),
+      supervisor(Channel.Supervisor, []),
       supervisor(:cowboy, cowboy_args, function: :start_http)
     ]
 
