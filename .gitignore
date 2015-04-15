@@ -1,0 +1,6 @@
+
+gateway/priv/ssl/server.csr
+
+gateway/priv/ssl/ca.srl
+
+gateway/priv/ssl/ca.key
