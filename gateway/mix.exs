@@ -12,7 +12,7 @@ defmodule XonnectGateway.Mixfile do
 
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:cowboy, :jsx, :sockjs, :exlager, :amnesia],
+    [applications: [:cowboy, :jsx, :sockjs, :exlager, :amnesia, :socket],
      mod: {XonnectGateway, []}]
   end
 
@@ -25,6 +25,7 @@ defmodule XonnectGateway.Mixfile do
      {:amnesia, git: "git://github.com/meh/amnesia.git"},
      {:poolboy, git: "git://github.com/devinus/poolboy.git", override: true},
      {:uuid, git: "git://github.com/okeuday/uuid.git"},
-     {:bson, git: "git://github.com/checkiz/elixir-bson.git"}]
+     {:bson, git: "git://github.com/checkiz/elixir-bson.git"},
+     {:socket, git: "git://github.com/meh/elixir-socket.git"}]
   end
 end

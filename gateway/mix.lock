@@ -10,5 +10,6 @@
   "poolboy": {:git, "git://github.com/devinus/poolboy.git", "42c631720e16cd9657585c125d1e1cf3acc82c59", []},
   "quickrand": {:hex, :quickrand, "1.4.0"},
   "ranch": {:git, "git://github.com/ninenines/ranch.git", "adf1822defc2b7cfdc7aca112adabfa1d614043c", [ref: "1.0.0"]},
+  "socket": {:git, "git://github.com/meh/elixir-socket.git", "1d1a85031e862dbf1d17f1c867a5871bc52e95da", []},
   "sockjs": {:git, "git://github.com/xhs/sockjs-erlang.git", "17a54a83734193c0fdfd432717d6d8a7856bcb44", []},
   "uuid": {:git, "git://github.com/okeuday/uuid.git", "41e4e0edc4fe6291227b3fe74f7c2362f2525b21", []}}
