@@ -4,6 +4,12 @@ config :gateway, :cowboy,
   domain: "localhost",
   port: 60081
 
+config :gateway, :tcp_interface,
+  port: 50080
+
+config :gateway, :ssl_interface,
+  port: 50443
+
 config :lager, :handlers,
   lager_console_backend: :debug,
   lager_file_backend: [file: 'log/info.log', level: :info, size: 20971520, date: '$D0', count: 10],

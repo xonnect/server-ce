@@ -6,7 +6,11 @@ defmodule XonnectGateway do
 
     cowboy = Application.get_env(:gateway, :cowboy)
     domain = cowboy[:domain]
-    port = cowboy[:port]
+    http_port = cowboy[:port]
+    tcp = Application.get_env(:gateway, :tcp_interface)
+    tcp_port = tcp[:port]
+    ssl = Application.get_env(:gateway, :ssl_interface)
+    ssl_port = ssl[:port]
 
     websocket = :sockjs_handler.init_state("/api/v1", Network.Websocket.Socket, [], [])
 
