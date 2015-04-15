@@ -1,4 +1,4 @@
-defmodule Handler.Socket do
+defmodule Network.Websocket.Socket do
   alias Model.Collection, as: Collection
   alias Nick.Agent, as: Nick
   alias Channel.Agent, as: Channel
@@ -6,11 +6,10 @@ defmodule Handler.Socket do
   require Lager
   @bahaviour :sockjs_service
 
-  fields socket: nil,
-         nick: nil
+  fields nick: nil
 
   def sockjs_init(_connection, []) do
-    socket_info = new socket: self
+    socket_info = new
     {:ok, {:unknown, socket_info}}
   end
 
@@ -125,7 +124,7 @@ defmodule Handler.Socket do
         Nick.send "@" <> socket_info.nick, nick, data
       "#" ->
         channel = String.slice target, 1..-1
-        Channel.broadcast channel, data, socket_info
+        Channel.broadcast channel, data, self
     end
     if ref != nil do
       body = Utility.encode_body interface, "ok", "send.ok", [ref: ref]

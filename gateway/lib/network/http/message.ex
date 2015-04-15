@@ -1,4 +1,4 @@
-defmodule Handler.Message do
+defmodule Network.HTTP.Message do
   use Cowboy.HTTP
   alias Model.Collection, as: Collection
   alias Nick.Agent, as: Nick

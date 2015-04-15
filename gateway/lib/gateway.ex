@@ -8,14 +8,14 @@ defmodule XonnectGateway do
     domain = cowboy[:domain]
     port = cowboy[:port]
 
-    websocket = :sockjs_handler.init_state("/api/v1", Handler.Socket, [], [])
+    websocket = :sockjs_handler.init_state("/api/v1", Network.Websocket.Socket, [], [])
 
     dispatch = :cowboy_router.compile([
       {domain, [
         {"/assets/[...]", :cowboy_static, {
           :priv_dir, :gateway, "assets", [{:mimetypes, :cow_mimetypes, :all}]
         }},
-        {"/api/v1/messages", Handler.Message, []},
+        {"/api/v1/messages", Network.HTTP.Message, []},
         {"/api/v1/websocket", :sockjs_cowboy_handler, websocket}
       ]}
     ])
