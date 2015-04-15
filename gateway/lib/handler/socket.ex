@@ -125,7 +125,7 @@ defmodule Handler.Socket do
     case String.first target do
       "@" ->
         nick = String.slice target, 1..-1
-        Nick.send socket_info.nick, nick, data
+        Nick.send "@" <> socket_info.nick, nick, data
         if ref != nil do
           body = Utility.encode_body interface, "ok", "send.ok", [ref: ref]
           connection.send body

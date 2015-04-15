@@ -15,6 +15,7 @@ defmodule XonnectGateway do
         {"/assets/[...]", :cowboy_static, {
           :priv_dir, :gateway, "assets", [{:mimetypes, :cow_mimetypes, :all}]
         }},
+        {"/api/v1/messages", Handler.Message, []},
         {"/api/v1/websocket", :sockjs_cowboy_handler, websocket}
       ]}
     ])
