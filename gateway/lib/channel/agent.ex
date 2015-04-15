@@ -6,7 +6,7 @@ defmodule Channel.Agent do
   require Lager
 
   fields identifier: nil,
-         sockets: nil
+         pids: nil
 
   # GenServer api
   def start_link(identifier) do
@@ -26,59 +26,57 @@ defmodule Channel.Agent do
     end
   end
 
-  def subscribe(identifier, socket_info) do
-    {:ok, pid} = get(identifier)
-    GenServer.call pid, {:subscribe, socket_info}
+  def subscribe(identifier, pid) do
+    {:ok, ch} = get(identifier)
+    GenServer.call ch, {:subscribe, pid}
   end
 
-  def unsubscribe(identifier, socket_info) do
-    {:ok, pid} = get(identifier)
-    GenServer.cast pid, {:unsubscribe, socket_info}
+  def unsubscribe(identifier, pid) do
+    {:ok, ch} = get(identifier)
+    GenServer.cast ch, {:unsubscribe, pid}
   end
 
   def broadcast(identifier, data) do
-    {:ok, pid} = get(identifier)
-    GenServer.cast pid, {:broadcast, data}
+    {:ok, ch} = get(identifier)
+    GenServer.cast ch, {:broadcast, data}
   end
 
-  def broadcast(identifier, data, socket_info) do
-    {:ok, pid} = get(identifier)
-    GenServer.cast pid, {:broadcast, data, socket_info}
+  def broadcast(identifier, data, pid) do
+    {:ok, ch} = get(identifier)
+    GenServer.cast ch, {:broadcast, data, pid}
   end
 
   # GenServer callbacks
   def init([identifier]) do
     Lager.debug "[channel.agent/init] channel ~p is created", [identifier]
-    channel_info = new identifier: identifier, sockets: :orddict.new
+    channel_info = new identifier: identifier, pids: :orddict.new
     {:ok, channel_info}
   end
 
-  def handle_call({:subscribe, socket_info}, _from, channel_info) do
-    socket = socket_info.socket
-    sockets = channel_info.sockets
-    result = :orddict.find(socket, sockets)
+  def handle_call({:subscribe, pid}, _from, channel_info) do
+    pids = channel_info.pids
+    result = :orddict.find(pid, pids)
     case result do
       {:ok, _} ->
-        Lager.debug "[channel.agent/handle_call] ~p is already in channel ~p", [socket, channel_info.identifier]
+        Lager.debug "[channel.agent/handle_call] ~p is already in channel ~p", [pid, channel_info.identifier]
         {:reply, :ok, channel_info}
       :error ->
-        socket_ref = :erlang.monitor :process, socket
-        sockets = :orddict.store socket, {socket_ref, socket_info}, sockets
-        channel_info = channel_info.update sockets: sockets
-        Lager.debug "[channel.agent/handle_call] ~p joins channel ~p", [socket, channel_info.identifier]
+        pid_ref = :erlang.monitor :process, pid
+        pids = :orddict.store pid, {pid_ref, pid}, pids
+        channel_info = channel_info.update pids: pids
+        Lager.debug "[channel.agent/handle_call] ~p joins channel ~p", [pid, channel_info.identifier]
         {:reply, :ok, channel_info}
     end
   end
 
-  def handle_cast({:unsubscribe, socket_info}, channel_info) do
-    socket = socket_info.socket
-    sockets = channel_info.sockets
-    {socket_ref, _} = :orddict.fetch socket, sockets
-    true = :erlang.demonitor socket_ref
-    sockets = :orddict.erase socket, sockets
-    channel_info = channel_info.update sockets: sockets
-    Lager.debug "[channel.agent/handle_cast] ~p leaves channel ~p", [socket, channel_info.identifier]
-    case :orddict.is_empty(sockets) do
+  def handle_cast({:unsubscribe, pid}, channel_info) do
+    pids = channel_info.pids
+    {pid_ref, _} = :orddict.fetch pid, pids
+    true = :erlang.demonitor pid_ref
+    pids = :orddict.erase pid, pids
+    channel_info = channel_info.update pids: pids
+    Lager.debug "[channel.agent/handle_cast] ~p leaves channel ~p", [pid, channel_info.identifier]
+    case :orddict.is_empty(pids) do
       true ->
         Cache.remove {:channel, channel_info.identifier}
         {:stop, :normal, channel_info}
@@ -88,34 +86,33 @@ defmodule Channel.Agent do
   end
 
   def handle_cast({:broadcast, data}, channel_info) do
-    sockets = channel_info.sockets
+    pids = channel_info.pids
     message = {:channel_message, "#" <> channel_info.identifier, data}
-    sockets |> Enum.map fn({socket_pid, _}) ->
-      send socket_pid, message
+    pids |> Enum.map fn({pid, _}) ->
+      send pid, message
     end
     {:noreply, channel_info}
   end
 
-  def handle_cast({:broadcast, data, socket_info}, channel_info) do
-    socket = socket_info.socket
-    sockets = channel_info.sockets
+  def handle_cast({:broadcast, data, pid}, channel_info) do
+    pids = channel_info.pids
     message = {:channel_message, "#" <> channel_info.identifier, data}
-    sockets |> Enum.map fn({socket_pid, _}) ->
-      if socket == socket_pid do
+    pids |> Enum.map fn({p, _}) ->
+      if pid == p do
         :ok
       else
-        send socket_pid, message
+        send pid, message
       end
     end
     {:noreply, channel_info}
   end
 
-  def handle_info({:'DOWN', _, _, socket, _}, channel_info) do
-    Lager.debug "[channel.agent/handle_info] ~p loses connection to channel ~p", [socket, channel_info.identifier]
-    sockets = channel_info.sockets
-    sockets = :orddict.erase socket, sockets
-    channel_info = channel_info.update sockets: sockets
-    case :orddict.is_empty(sockets) do
+  def handle_info({:'DOWN', _, _, pid, _}, channel_info) do
+    Lager.debug "[channel.agent/handle_info] ~p loses connection to channel ~p", [pid, channel_info.identifier]
+    pids = channel_info.pids
+    pids = :orddict.erase pid, pids
+    channel_info = channel_info.update pids: pids
+    case :orddict.is_empty(pids) do
       true ->
         Cache.remove {:channel, channel_info.identifier}
         {:stop, :normal, channel_info}
