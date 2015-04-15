@@ -25,13 +25,15 @@ defmodule XonnectGateway do
     ])
 
     cowboy_args = [:http, 8,
-      [{:port, port}],
-      [{:env, [{:dispatch, dispatch}]}]
+      [port: http_port],
+      [env: [dispatch: dispatch]]
     ]
 
     children = [
       supervisor(Nick.Agent, []),
       supervisor(Channel.Supervisor, []),
+      supervisor(Network.Raw.TCP.Supervisor, [tcp_port]),
+      supervisor(Network.Raw.SSL.Supervisor, [ssl_port]),
       supervisor(:cowboy, cowboy_args, function: :start_http)
     ]
 
