@@ -13,7 +13,7 @@ defmodule Network.Raw.TCP.Supervisor do
         :tcp_interface, 8,
         :ranch_tcp,
         [{:port, tcp_port}, {:max_connections, :infinity}],
-        Network.Raw.Echo, []
+        Network.Raw.Protocol, []
       ], function: :start_listener)
     ]
     supervise children, strategy: :one_for_one, max_restarts: 10, max_seconds: 10

@@ -19,7 +19,7 @@ defmodule Network.Raw.SSL.Supervisor do
           certfile: privdir ++ '/ssl/server.crt',
           keyfile: privdir ++ '/ssl/server.key'
         ],
-        Network.Raw.Echo, []
+        Network.Raw.Protocol, []
       ], function: :start_listener)
     ]
     supervise children, strategy: :one_for_one, max_restarts: 10, max_seconds: 10
