@@ -14,7 +14,7 @@ defmodule Network.Websocket.Socket do
   end
 
   def sockjs_handle(connection, data, {:unknown, socket_info}) do
-    Lager.debug "[handler.socket/sockjs_handle] socket info: ~p", [socket_info]
+    Lager.debug "[network.websocket.socket/sockjs_handle] socket info: ~p", [socket_info]
     try do
       list = :jsx.decode data
       try do
@@ -23,7 +23,7 @@ defmodule Network.Websocket.Socket do
         do_handle connection, action, list, {:json, socket_info}
       rescue
         _whatever ->
-          Lager.debug "[handler.socket/sockjs_handle] bad json request"
+          Lager.debug "[network.websocket.socket/sockjs_handle] bad json request"
           body = Utility.encode_body :json, "error", "bad.request"
           connection.send body
           {:ok, {:json, socket_info}}
@@ -36,7 +36,7 @@ defmodule Network.Websocket.Socket do
           do_handle connection, action, map, {:bson, socket_info}
         rescue
           _whatever ->
-            Lager.debug "[handler.socket/sockjs_handle] bad bson request"
+            Lager.debug "[network.websocket.socket/sockjs_handle] bad bson request"
             body = Utility.encode_body :bson, "error", "bad.request"
             connection.send body
             {:ok, {:bson, socket_info}}
@@ -45,7 +45,7 @@ defmodule Network.Websocket.Socket do
   end
 
   def sockjs_handle(connection, json, state={:json, socket_info}) do
-    Lager.debug "[handler.socket/sockjs_handle] socket info: ~p", [socket_info]
+    Lager.debug "[network.websocket.socket/sockjs_handle] socket info: ~p", [socket_info]
     try do
       list = :jsx.decode json
       action = :proplists.get_value "action", list
@@ -53,7 +53,7 @@ defmodule Network.Websocket.Socket do
       do_handle connection, action, list, state
     rescue
       _whatever ->
-        Lager.debug "[handler.socket/sockjs_handle] bad json request"
+        Lager.debug "[network.websocket.socket/sockjs_handle] bad json request"
         body = Utility.encode_body :json, "error", "bad.request"
         connection.send body
         {:ok, state}
@@ -61,14 +61,14 @@ defmodule Network.Websocket.Socket do
   end
 
   def sockjs_handle(connection, bson, state={:bson, socket_info}) do
-    Lager.debug "[handler.socket/sockjs_handle] socket info: ~p", [socket_info]
+    Lager.debug "[network.websocket.socket/sockjs_handle] socket info: ~p", [socket_info]
     try do
       map = Bson.decode bson
       action = map.action
       do_handle connection, action, map, state
     rescue
       _whatever ->
-        Lager.debug "[handler.socket/sockjs_handle] bad bson request"
+        Lager.debug "[network.websocket.socket/sockjs_handle] bad bson request"
         body = Utility.encode_body :bson, "error", "bad.request"
         connection.send body
         {:ok, state}
