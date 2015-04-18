@@ -24,13 +24,13 @@
 
 <br/>
 
-### JSON API Demo
+### JSON APIs Demo
 
 Usually, a client needs a universally unique identifier so that it can be found by other clients via name.
 
 Register a unique nickname:
 
-```
+```json
 {
     "action": "register",
     "nick": "foo"
@@ -39,7 +39,7 @@ Register a unique nickname:
 
 If everything goes fine:
 
-```
+```json
 {
     "code": "ok",
     "info": "register.ok",
@@ -49,7 +49,7 @@ If everything goes fine:
 
 Or if the nickname is already taken:
 
-```
+```json
 {
     "code": "error",
     "info": "register.conflict",
@@ -57,7 +57,7 @@ Or if the nickname is already taken:
 }
 ```
 
-"nick" parameter in the request is optional. If it is omitted, a random one will be generated and returned instead.
+"nick" field in the request is optional. If it is omitted, a random one will be generated and returned instead.
 
 <br/>
 
@@ -65,7 +65,7 @@ Messages are broadcast in channels or sent peer-to-peer.
 
 Subscribe to a channel:
 
-```
+```json
 {
     "action": "subscribe",
     "channel": "demo"
@@ -74,7 +74,7 @@ Subscribe to a channel:
 
 If the channel does not exist yet, it will be automatically created.
 
-```
+```json
 {
     "code": "ok",
     "info": "subscribe.ok",
@@ -84,7 +84,7 @@ If the channel does not exist yet, it will be automatically created.
 
 When you don't want to receive messages from a channel any more, just unsubscribe it.
 
-```
+```json
 {
     "action": "unsubscribe",
     "channel": "demo"
@@ -93,11 +93,11 @@ When you don't want to receive messages from a channel any more, just unsubscrib
 
 <br/>
 
-As mentioned above, messages can be sent to channels and some specific peer.
+As mentioned above, messages can be sent to channels and some specific peer by its nickname.
 
 Broadcast a message in a channel:
 
-```
+```json
 {
     "action": "send",
     "target": "#demo",
@@ -109,7 +109,7 @@ You don't need to be a member of a channel first to send messages to it, althoug
 
 Send a message to a peer:
 
-```
+```json
 {
     "action": "send",
     "target": "@bar",
@@ -117,9 +117,9 @@ Send a message to a peer:
 }
 ```
 
-By default no response is generated since no news is good news, but if you really need a confirmation, add a "ref" parameter to the request.
+By default no response is generated since no news is good news, but if you really need a confirmation, add a "ref" field to the request.
 
-```
+```json
 {
     "action": "send",
     "target": "@bar",
@@ -130,7 +130,7 @@ By default no response is generated since no news is good news, but if you reall
 
 And it will be returned untouched.
 
-```
+```json
 {
     "code": "ok",
     "info": "send.ok",
@@ -142,7 +142,7 @@ And it will be returned untouched.
 
 When a new message has arrived from a channel, it looks like this:
 
-```
+```json
 {
     "code": "new",
     "info": {
@@ -154,7 +154,7 @@ When a new message has arrived from a channel, it looks like this:
 
 Here is the one from another peer directly:
 
-```
+```json
 {
     "code": "new",
     "info": {
@@ -164,9 +164,9 @@ Here is the one from another peer directly:
 }
 ```
 
-Specially, since a direct message from a one-way HTTP endpoint has no way to identify itself, the "from" field will be filled with a reserved source "~unknown":
+Specially, since a direct message from a one-way HTTP endpoint has no way to identify itself, the "from" field will be filled in with a reserved source "~unknown":
 
-```
+```json
 {
     "code": "new",
     "info": {
@@ -178,19 +178,19 @@ Specially, since a direct message from a one-way HTTP endpoint has no way to ide
 
 <br/>
 
-### BSON API
+### BSON APIs
 
 BSON APIs are the same with JSON APIs, except that they are encoded in BSON. 
 
 <br/>
 
-### HTTP API
+### HTTP APIs
 
-The HTTP API can only be used to send messages and it only supports JSON encoded request.
+The HTTP APIs can only be used to send messages and they only support JSON encoded requests.
 
 Broadcast a message in a channel:
 
-```
+```http
 POST /api/v1/messages
 
 {
@@ -201,7 +201,7 @@ POST /api/v1/messages
 
 Send a message to a peer:
 
-```
+```http
 POST /api/v1/messages
 
 {
@@ -210,7 +210,7 @@ POST /api/v1/messages
 }
 ```
 
-In both situations, a "201 Created" will be returned.
+In both situations, a `201 Created` will be returned.
 
 <br/>
 
