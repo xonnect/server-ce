@@ -1,6 +1,6 @@
 ## XonnectIO Gateway Server Community Edition
 
-<br/>
+This is the source code of our community edition gateway server, it contains almost all the common features we provide at [XonnectIO](https://xonnect.io).
 
 ### API URLs
 
@@ -22,7 +22,6 @@
 
 `tcp+tls://your.domain:50443`
 
-<br/>
 
 ### JSON APIs Demo
 
@@ -123,7 +122,7 @@ By default no response is generated since no news is good news, but if you reall
 {
     "action": "send",
     "target": "@bar",
-    "data": "Hi, buddy. Again."
+    "data": "Hi, buddy. Again.",
     "ref": "blah~blah~"
 }
 ```
@@ -176,13 +175,9 @@ Specially, since a direct message from a one-way HTTP endpoint has no way to ide
 }
 ```
 
-<br/>
-
 ### BSON APIs
 
 BSON APIs are the same with JSON APIs, except that they are encoded in BSON. 
-
-<br/>
 
 ### HTTP APIs
 
@@ -211,8 +206,6 @@ POST /api/v1/messages
 ```
 
 In both situations, a `201 Created` will be returned.
-
-<br/>
 
 ### License
 
