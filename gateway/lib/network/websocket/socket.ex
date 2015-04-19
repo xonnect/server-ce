@@ -105,13 +105,6 @@ defmodule Network.Websocket.Socket do
   end
 
   defp do_handle(connection, "send", collection, {interface, socket_info}) do
-    if socket_info.nick == nil do
-      {:ok, nick} = Nick.register
-      body = Utility.encode_body interface, "ok", "register.ok", nick
-      connection.send body
-      socket_info = socket_info.update nick: nick
-    end
-
     target = Collection.get collection, "target"
     true = target != nil
     true = String.length(target) > 1
@@ -120,6 +113,13 @@ defmodule Network.Websocket.Socket do
     ref = Collection.get collection, "ref"
     case String.first target do
       "@" ->
+        if socket_info.nick == nil do
+          {:ok, nick} = Nick.register
+          body = Utility.encode_body interface, "ok", "register.ok", nick
+          connection.send body
+          socket_info = socket_info.update nick: nick
+        end
+    
         nick = String.slice target, 1..-1
         Nick.send "@" <> socket_info.nick, nick, data
       "#" ->

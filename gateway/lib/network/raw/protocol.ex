@@ -169,13 +169,6 @@ defmodule Network.Raw.Protocol do
   end
 
   defp do_handle(socket, transport, "send", collection, {interface, info}) do
-    if info.nick == nil do
-      {:ok, nick} = Nick.register
-      body = Utility.encode_body interface, "ok", "register.ok", nick
-      transport.send socket, body
-      info = info.update nick: nick
-    end
-
     target = Collection.get collection, "target"
     true = target != nil
     true = String.length(target) > 1
@@ -184,6 +177,13 @@ defmodule Network.Raw.Protocol do
     ref = Collection.get collection, "ref"
     case String.first target do
       "@" ->
+        if info.nick == nil do
+          {:ok, nick} = Nick.register
+          body = Utility.encode_body interface, "ok", "register.ok", nick
+          transport.send socket, body
+          info = info.update nick: nick
+        end
+    
         nick = String.slice target, 1..-1
         Nick.send "@" <> info.nick, nick, data
       "#" ->
