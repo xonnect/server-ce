@@ -163,7 +163,7 @@ Here is the one from another peer directly:
 }
 ```
 
-Specially, since a direct message from a one-way HTTP endpoint has no way to identify itself, the "from" field will be filled in with a reserved source "~unknown":
+Specifically, since a direct message from a one-way HTTP endpoint has no way to identify itself, the "from" field will be filled in with a reserved source "~unknown":
 
 ```json
 {
