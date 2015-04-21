@@ -11,12 +11,13 @@ defmodule Network.Raw.TCP.Supervisor do
     tcp = Application.get_env(:gateway, :tcp_interface)
     tcp_port = tcp[:port]
     listener_num = tcp[:listener_num]
+    connection_num = tcp[:connection_num]
 
     children = [
       worker(:ranch, [
         :tcp_interface, listener_num,
         :ranch_tcp,
-        [{:port, tcp_port}, {:max_connections, :infinity}],
+        [{:port, tcp_port}, {:max_connections, connection_num}],
         Network.Raw.Protocol, []
       ], function: :start_listener)
     ]

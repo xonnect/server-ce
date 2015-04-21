@@ -11,6 +11,7 @@ defmodule Network.Raw.SSL.Supervisor do
     ssl = Application.get_env(:gateway, :ssl_interface)
     ssl_port = ssl[:port]
     listener_num = ssl[:listener_num]
+    connection_num = ssl[:connection_num]
 
     privdir = :code.priv_dir(:gateway)
     children = [
@@ -18,7 +19,7 @@ defmodule Network.Raw.SSL.Supervisor do
         :ssl_interface, listener_num,
         :ranch_ssl, [
           port: ssl_port,
-          max_connections: :infinity,
+          max_connections: connection_num,
           cacertfile: privdir ++ '/ssl/ca.crt',
           certfile: privdir ++ '/ssl/server.crt',
           keyfile: privdir ++ '/ssl/server.key'

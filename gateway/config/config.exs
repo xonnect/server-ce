@@ -7,11 +7,13 @@ config :gateway, :cowboy,
 
 config :gateway, :tcp_interface,
   port: 50080,
-  listener_num: 16
+  listener_num: 16,
+  connection_num: :infinity
 
 config :gateway, :ssl_interface,
   port: 50443,
-  listener_num: 16
+  listener_num: 16,
+  connection_num: :infinity
 
 config :lager, :handlers,
   lager_console_backend: :debug,
