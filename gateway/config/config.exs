@@ -2,13 +2,16 @@ use Mix.Config
 
 config :gateway, :cowboy,
   domain: "localhost",
-  port: 60081
+  port: 60081,
+  listener_num: 32
 
 config :gateway, :tcp_interface,
-  port: 50080
+  port: 50080,
+  listener_num: 16
 
 config :gateway, :ssl_interface,
-  port: 50443
+  port: 50443,
+  listener_num: 16
 
 config :lager, :handlers,
   lager_console_backend: :debug,

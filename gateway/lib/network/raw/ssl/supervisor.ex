@@ -2,16 +2,20 @@ defmodule Network.Raw.SSL.Supervisor do
   use Supervisor
 
   # Supervisor api
-  def start_link(ssl_port) do
-    Supervisor.start_link __MODULE__, ssl_port, name: __MODULE__
+  def start_link() do
+    Supervisor.start_link __MODULE__, [], name: __MODULE__
   end
 
   # Supervisor callback
-  def init(ssl_port) do
+  def init([]) do
+    ssl = Application.get_env(:gateway, :ssl_interface)
+    ssl_port = ssl[:port]
+    listener_num = ssl[:listener_num]
+
     privdir = :code.priv_dir(:gateway)
     children = [
       worker(:ranch, [
-        :ssl_interface, 8,
+        :ssl_interface, listener_num,
         :ranch_ssl, [
           port: ssl_port,
           max_connections: :infinity,

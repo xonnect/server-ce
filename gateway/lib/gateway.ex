@@ -7,10 +7,7 @@ defmodule XonnectGateway do
     cowboy = Application.get_env(:gateway, :cowboy)
     domain = cowboy[:domain]
     http_port = cowboy[:port]
-    tcp = Application.get_env(:gateway, :tcp_interface)
-    tcp_port = tcp[:port]
-    ssl = Application.get_env(:gateway, :ssl_interface)
-    ssl_port = ssl[:port]
+    listener_num = cowboy[:listener_num]
 
     websocket = :sockjs_handler.init_state("/api/v1", Network.Websocket.Socket, [], [])
 
@@ -31,7 +28,7 @@ defmodule XonnectGateway do
       ]}
     ])
 
-    cowboy_args = [:http, 8,
+    cowboy_args = [:http, listener_num,
       [port: http_port],
       [env: [dispatch: dispatch]]
     ]
@@ -39,8 +36,8 @@ defmodule XonnectGateway do
     children = [
       supervisor(Nick.Agent, []),
       supervisor(Channel.Supervisor, []),
-      supervisor(Network.Raw.TCP.Supervisor, [tcp_port]),
-      supervisor(Network.Raw.SSL.Supervisor, [ssl_port]),
+      supervisor(Network.Raw.TCP.Supervisor, []),
+      supervisor(Network.Raw.SSL.Supervisor, []),
       supervisor(:cowboy, cowboy_args, function: :start_http)
     ]
 

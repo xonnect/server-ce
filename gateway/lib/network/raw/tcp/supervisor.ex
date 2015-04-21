@@ -2,15 +2,19 @@ defmodule Network.Raw.TCP.Supervisor do
   use Supervisor
 
   # Supervisor api
-  def start_link(tcp_port) do
-    Supervisor.start_link __MODULE__, tcp_port, name: __MODULE__
+  def start_link() do
+    Supervisor.start_link __MODULE__, [], name: __MODULE__
   end
 
   # Supervisor callback
-  def init(tcp_port) do
+  def init([]) do
+    tcp = Application.get_env(:gateway, :tcp_interface)
+    tcp_port = tcp[:port]
+    listener_num = tcp[:listener_num]
+
     children = [
       worker(:ranch, [
-        :tcp_interface, 8,
+        :tcp_interface, listener_num,
         :ranch_tcp,
         [{:port, tcp_port}, {:max_connections, :infinity}],
         Network.Raw.Protocol, []
