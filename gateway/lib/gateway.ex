@@ -21,6 +21,13 @@ defmodule XonnectGateway do
         }},
         {"/api/v1/messages", Network.HTTP.Message, []},
         {"/api/v1/websocket", :sockjs_cowboy_handler, websocket}
+      ]},
+      {"unsafe." <> domain, [
+        {"/assets/[...]", :cowboy_static, {
+          :priv_dir, :gateway, "assets", [{:mimetypes, :cow_mimetypes, :all}]
+        }},
+        {"/api/v1/messages", Network.HTTP.Message, []},
+        {"/api/v1/websocket", :sockjs_cowboy_handler, websocket}
       ]}
     ])
 
