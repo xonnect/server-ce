@@ -104,7 +104,7 @@ Broadcast a message in a channel:
 }
 ```
 
-You don't need to be a member of a channel first to send messages to it, although it is usually recommended so that you can get notified when there is news in the channel.
+You don't need to be a member of a channel first to send messages to it (and sending messages does _not_ automatically adds you to a channel either), although it is usually recommended so that you can get notified when there is news or a response from the channel.
 
 Send a message to a peer:
 
