@@ -1,6 +1,6 @@
-## XonnectIO Gateway Server Community Edition
+## XONNECT Gateway Server Community Edition
 
-This is the source code of our community edition gateway server, it contains almost all the common features we provide at [XonnectIO](https://xonnect.io).
+This is the source code of our community edition gateway server, it contains almost all the common features we provide at [XONNECT](https://xonnect.io).
 
 ### API URLs
 
